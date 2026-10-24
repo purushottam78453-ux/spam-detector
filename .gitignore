@@ -1,0 +1,18 @@
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.log
+
+# Environments
+venv/
+env/
+.env
+
+# Large archive & duplicate dataset (keeping official dataset/spam.csv)
+archive.zip
+dataset/spam_ham_dataset.csv
+
+# IDE configurations
+.vscode/
+.idea/

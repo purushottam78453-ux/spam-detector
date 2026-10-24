@@ -1,0 +1,19 @@
+{
+    "dataset_total": 4993,
+    "train_count": 3994,
+    "test_count": 999,
+    "ham_count": 3531,
+    "spam_count": 1462,
+    "models": {
+        "naive_bayes": {
+            "name": "Multinomial Naive Bayes",
+            "accuracy": 0.9489,
+            "accuracy_percent": "94.89%"
+        },
+        "svm": {
+            "name": "Linear Support Vector Machine (SVM)",
+            "accuracy": 0.987,
+            "accuracy_percent": "98.70%"
+        }
+    }
+}

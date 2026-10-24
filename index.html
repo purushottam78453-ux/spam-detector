@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Email Spam Detection - Mini Project</title>
+    <meta name="description" content="Email and SMS Spam Detection System built with Python, scikit-learn, and Flask for B.E. Computer Science.">
+    
+    <!-- Clean, classic software font stack -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- Top Navigation / Application Header -->
+    <header class="app-header">
+        <div class="header-inner">
+            <div class="header-branding">
+                <span class="app-icon">▤</span>
+                <div>
+                    <h1 class="app-title">Email Spam Detection System</h1>
+                    <span class="app-dept">B.E. Computer Science & Engineering &bull; Mini-Project</span>
+                </div>
+            </div>
+            <div class="header-meta">
+                <span class="meta-tag">Machine Learning</span>
+                <span class="meta-tag">TF-IDF &bull; NLP</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main class="page-container">
+
+        <!-- Classifier Card -->
+        <section class="panel">
+            <div class="panel-header">
+                <h2>Message Spam Classifier</h2>
+                <span class="panel-desc">Test real-time spam classification on text messages and emails</span>
+            </div>
+
+            <div class="panel-body">
+                <!-- Example Prompts Toolbar -->
+                <div class="examples-toolbar">
+                    <span class="examples-label">Insert Test Example:</span>
+                    <button type="button" class="btn-example example-spam" id="sampleSpamBtn1">Spam: Free Prize</button>
+                    <button type="button" class="btn-example example-spam" id="sampleSpamBtn2">Spam: Urgent Alert</button>
+                    <button type="button" class="btn-example example-ham" id="sampleHamBtn1">Ham: College Notice</button>
+                    <button type="button" class="btn-example example-ham" id="sampleHamBtn2">Ham: Meeting Friend</button>
+                </div>
+
+                <form id="spamForm" onsubmit="return false;">
+                    <div class="field-group">
+                        <div class="field-label-row">
+                            <label for="messageInput">Message Text</label>
+                            <span class="char-count" id="charCounter">0 characters</span>
+                        </div>
+                        <textarea 
+                            id="messageInput" 
+                            class="input-textarea" 
+                            rows="5" 
+                            placeholder="Type or paste a message here to classify..." 
+                            required
+                        ></textarea>
+                    </div>
+
+                    <div class="controls-bar">
+                        <div class="control-select-group">
+                            <label for="modelSelect">Classification Algorithm:</label>
+                            <select id="modelSelect" class="input-select">
+                                <option value="naive_bayes" selected>Multinomial Naive Bayes (94.89% Accuracy)</option>
+                                <option value="svm">Support Vector Machine - Linear SVM (98.70% Accuracy)</option>
+                            </select>
+                        </div>
+
+                        <div class="control-actions">
+                            <button type="button" id="clearBtn" class="btn btn-secondary">Clear</button>
+                            <button type="submit" id="submitBtn" class="btn btn-primary">
+                                <span class="spinner" id="btnSpinner" aria-hidden="true"></span>
+                                <span id="btnText">Classify Message</span>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+
+                <!-- Error Box -->
+                <div id="errorAlert" class="alert-box alert-error" style="display: none;">
+                    <strong>Error:</strong> <span id="errorMessage">Please provide a message text.</span>
+                </div>
+
+                <!-- Loading State -->
+                <div id="loadingIndicator" class="loading-state" style="display: none;">
+                    <span class="loading-spinner"></span>
+                    <span>Processing message features with TF-IDF vectorizer...</span>
+                </div>
+
+                <!-- Prediction Result Display -->
+                <div id="resultCard" class="result-panel" style="display: none;">
+                    <div class="result-header">
+                        <span class="result-badge" id="resultBadge">Spam</span>
+                        <h3 class="result-headline" id="verdictHeadline">Result: Spam Message</h3>
+                    </div>
+                    <div class="result-body">
+                        <div class="result-row">
+                            <span class="row-label">Evaluated By:</span>
+                            <span class="row-value" id="resultModelName">Multinomial Naive Bayes</span>
+                        </div>
+                        <div class="result-row">
+                            <span class="row-label">Analysis:</span>
+                            <span class="row-value" id="resultExplanation">The message was classified based on vocabulary patterns learned from the training dataset.</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Model Evaluation & Performance Panel -->
+        <section class="panel">
+            <div class="panel-header">
+                <h2>Model Evaluation & Performance</h2>
+                <span class="panel-desc">Test accuracy evaluated on 20% unseen holdout dataset (scikit-learn)</span>
+            </div>
+
+            <div class="panel-body">
+                <!-- Evaluation Table -->
+                <table class="metrics-table">
+                    <thead>
+                        <tr>
+                            <th>Model Algorithm</th>
+                            <th>Approach</th>
+                            <th>Test Accuracy</th>
+                            <th>Active</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class="table-row active-row" id="nbMetricCard">
+                            <td>
+                                <strong>Multinomial Naive Bayes</strong>
+                                <span class="table-subtext">sklearn.naive_bayes.MultinomialNB</span>
+                            </td>
+                            <td>Probabilistic (Bayes' Rule)</td>
+                            <td class="accuracy-cell">
+                                <span class="accuracy-val" id="nbAccuracyValue">94.89%</span>
+                            </td>
+                            <td>
+                                <span class="active-indicator" id="nbSelectedBadge">Selected</span>
+                            </td>
+                        </tr>
+                        <tr class="table-row" id="svmMetricCard">
+                            <td>
+                                <strong>Support Vector Machine (Linear SVM)</strong>
+                                <span class="table-subtext">sklearn.svm.LinearSVC</span>
+                            </td>
+                            <td>Margin Maximization Hyperplane</td>
+                            <td class="accuracy-cell">
+                                <span class="accuracy-val" id="svmAccuracyValue">98.70%</span>
+                            </td>
+                            <td>
+                                <span class="active-indicator" id="svmSelectedBadge" style="display: none;">Selected</span>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <!-- Dataset Summary Table -->
+                <div class="dataset-meta-grid">
+                    <div class="meta-item">
+                        <span class="meta-title">Total Records</span>
+                        <span class="meta-value" id="datasetTotalCount">4,993</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-title">Training Split (80%)</span>
+                        <span class="meta-value" id="trainRecordsCount">3,994</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-title">Testing Split (20%)</span>
+                        <span class="meta-value" id="testRecordsCount">999</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-title">Feature Representation</span>
+                        <span class="meta-value">TF-IDF (5,000 max features)</span>
+                    </div>
+                </div>
+
+                <div id="metricsAlert" class="alert-box alert-info" style="display: none;">
+                    <span id="metricsAlertText">Train the models to view performance.</span>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Clean Academic Footer -->
+    <footer class="app-footer">
+        <div class="footer-inner">
+            <p class="footer-author">Made by Purushottam and Team</p>
+            <p class="footer-details">Email Spam Detection Mini-Project &bull; Department of Computer Science & Engineering</p>
+        </div>
+    </footer>
+
+    <!-- Application Script -->
+    <script src="script.js?v=6"></script>
+</body>
+</html>
